@@ -164,3 +164,141 @@ pub async fn generate_proof(
 
     Ok(proof)
 }
+
+pub async fn issue_presentation(
+    presentation: String,
+    proof_options: String,
+    key: &JWK,
+) -> Result<String, Error> {
+    let mut presentation = VerifiablePresentation::from_json_unsigned(&presentation)?;
+    //let key: JWK = serde_json::from_str(&key)?;
+    let options: JWTOrLDPOptions = serde_json::from_str(&proof_options)?;
+    let proof_format = options.proof_format.unwrap_or_default();
+    println!("proof options: {}", proof_options);
+    let resolver = DID_METHODS.to_resolver();
+    let mut context_loader = ContextLoader::default();
+    println!("proof format: {}", proof_format);
+    let vp_string = match proof_format {
+        ProofFormat::JWT => {
+            presentation
+                .generate_jwt(Some(&key), &options.ldp_options, resolver)
+                .await?
+        }
+        ProofFormat::LDP => {
+            let proof = presentation
+                .generate_proof(&key, &options.ldp_options, resolver, &mut context_loader)
+                .await?;
+            presentation.add_proof(proof);
+            serde_json::to_string(&presentation)?
+        }
+        _ => Err(Error::UnknownProofFormat(proof_format.to_string()))?,
+    };
+    Ok(vp_string)
+}
+
+// from didkit\lib\web\src\lib.rs
+pub async fn verify_presentation(vp_string: &str, proof_options: &str) -> Result<String, Error> {
+    let options: JWTOrLDPOptions = serde_json::from_str(&proof_options)?;
+    let proof_format = options.proof_format.unwrap_or_default();
+    let resolver = DID_METHODS.to_resolver();
+    let mut context_loader = ssi::jsonld::ContextLoader::default();
+    let result = match proof_format {
+        ProofFormat::JWT => {
+            VerifiablePresentation::verify_jwt(
+                vp_string,
+                Some(options.ldp_options),
+                resolver,
+                &mut context_loader,
+            )
+            .await
+        }
+        ProofFormat::LDP => {
+            let vp = VerifiablePresentation::from_json_unsigned(vp_string)?;
+            vp.verify(Some(options.ldp_options), resolver, &mut context_loader)
+                .await
+        }
+        _ => Err(Error::UnknownProofFormat(proof_format.to_string()))?,
+    };
+    let result_json = serde_json::to_string(&result)?;
+    Ok(result_json)
+}
+
+// from didkit\lib\web\src\lib.rs
+pub async fn issue_credential(
+    credential: String,
+    proof_options: String,
+    key: &JWK,
+) -> Result<String, Error> {
+    let mut credential = VerifiableCredential::from_json_unsigned(&credential)?;
+    //let key: JWK = serde_json::from_str(&key)?;
+    let options: JWTOrLDPOptions = serde_json::from_str(&proof_options)?;
+    let proof_format = options.proof_format.unwrap_or_default();
+    let resolver = DID_METHODS.to_resolver();
+    let mut context_loader = ssi::jsonld::ContextLoader::default();
+    let vc_string = match proof_format {
+        ProofFormat::JWT => {
+            let vc_jwt = credential
+                .generate_jwt(Some(&key), &options.ldp_options, resolver)
+                .await?;
+            vc_jwt
+        }
+        ProofFormat::LDP => {
+            let proof = credential
+                .generate_proof(&key, &options.ldp_options, resolver, &mut context_loader)
+                .await?;
+            credential.add_proof(proof);
+            let vc_json = serde_json::to_string(&credential)?;
+            vc_json
+        }
+        _ => Err(Error::UnknownProofFormat(proof_format.to_string()))?,
+    };
+    Ok(vc_string)
+}
+
+pub async fn verify_credential(vc_string: String, proof_options: String) -> Result<String, Error> {
+    let options: JWTOrLDPOptions = serde_json::from_str(&proof_options)?;
+    let proof_format = options.proof_format.unwrap_or_default();
+    let resolver = DID_METHODS.to_resolver();
+    let mut context_loader = ssi::jsonld::ContextLoader::default();
+    let result = match proof_format {
+        ProofFormat::JWT => {
+            VerifiableCredential::verify_jwt(
+                &vc_string,
+                Some(options.ldp_options),
+                resolver,
+                &mut context_loader,
+            )
+            .await
+        }
+        ProofFormat::LDP => {
+            let vc = VerifiableCredential::from_json_unsigned(&vc_string)?;
+            vc.verify(Some(options.ldp_options), resolver, &mut context_loader)
+                .await
+        }
+        _ => Err(Error::UnknownProofFormat(proof_format.to_string()))?,
+    };
+    let result_json = serde_json::to_string(&result)?;
+    Ok(result_json)
+}
+
+// from didkit\lib\web\src\lib.rs
+pub async fn key_to_verification_method(method_pattern: String, key: &JWK) -> Result<String, Error> {
+    //let key: JWK = serde_json::from_str(&jwk)?;
+    let did = DID_METHODS
+        .generate(&Source::KeyAndPattern(key, &method_pattern))
+        .ok_or(Error::UnableToGenerateDID)?;
+    let did_resolver = DID_METHODS.to_resolver();
+    let vm = get_verification_method(&did, did_resolver)
+        .await
+        .ok_or(Error::UnableToGetVerificationMethod)?;
+    Ok(vm)
+}
+
+// from didkit\lib\web\src\lib.rs
+pub fn key_to_did(method_pattern: String, key: &JWK) -> Result<String, Error> {
+    //let key: JWK = serde_json::from_str(&jwk)?;
+    let did = DID_METHODS
+        .generate(&Source::KeyAndPattern(key, &method_pattern))
+        .ok_or(Error::UnableToGenerateDID)?;
+    Ok(did)
+}
