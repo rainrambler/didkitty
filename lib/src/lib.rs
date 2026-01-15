@@ -191,7 +191,7 @@ pub async fn issue_presentation(
             presentation.add_proof(proof);
             serde_json::to_string(&presentation)?
         }
-        _ => Err(Error::UnknownProofFormat(proof_format.to_string()))?,
+        //_ => Err(Error::UnknownProofFormat(proof_format.to_string()))?,
     };
     Ok(vp_string)
 }
@@ -217,7 +217,7 @@ pub async fn verify_presentation(vp_string: &str, proof_options: &str) -> Result
             vp.verify(Some(options.ldp_options), resolver, &mut context_loader)
                 .await
         }
-        _ => Err(Error::UnknownProofFormat(proof_format.to_string()))?,
+        //_ => Err(Error::UnknownProofFormat(proof_format.to_string()))?,
     };
     let result_json = serde_json::to_string(&result)?;
     Ok(result_json)
@@ -250,7 +250,7 @@ pub async fn issue_credential(
             let vc_json = serde_json::to_string(&credential)?;
             vc_json
         }
-        _ => Err(Error::UnknownProofFormat(proof_format.to_string()))?,
+        //_ => Err(Error::UnknownProofFormat(proof_format.to_string()))?,
     };
     Ok(vc_string)
 }
@@ -275,7 +275,7 @@ pub async fn verify_credential(vc_string: String, proof_options: String) -> Resu
             vc.verify(Some(options.ldp_options), resolver, &mut context_loader)
                 .await
         }
-        _ => Err(Error::UnknownProofFormat(proof_format.to_string()))?,
+        //_ => Err(Error::UnknownProofFormat(proof_format.to_string()))?,
     };
     let result_json = serde_json::to_string(&result)?;
     Ok(result_json)
