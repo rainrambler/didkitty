@@ -4,8 +4,8 @@ use anyhow::{anyhow, bail, Context, Error as AError, Result as AResult};
 use chrono::prelude::*;
 use clap::{ArgGroup, Args, Parser, Subcommand};
 use credential::{CredentialIssueArgs, CredentialVerifyArgs};
-use didkit::ssi::ldp::ProofSuiteType;
-use didkit::{
+use didkitx::ssi::ldp::ProofSuiteType;
+use didkitx::{
     ssi::did::ServiceEndpoint, DIDMethod, Error, LinkedDataProofOptions, Metadata, ProofFormat,
     VerificationRelationship, DIDURL, DID_METHODS, JWK, URI,
 };
@@ -428,7 +428,7 @@ fn metadata_properties_to_value(meta_props: Vec<MetadataProperty>) -> Result<Val
                     Value::Null => {
                         entry.insert(value);
                     }
-                    Value::Array(ref mut array) => {
+                    Value::Array(array) => {
                         array.push(value);
                     }
                     _ => {
