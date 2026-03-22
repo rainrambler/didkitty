@@ -62,7 +62,7 @@ impl Error {
     }
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 /// Retrieve a human-readable description of the most recent error encountered by a DIDKit C
 /// function. The returned string is valid until the next call to a DIDKit function in the current
 /// thread, and should not be mutated or freed. If there has not been any error, `NULL` is returned.
@@ -76,7 +76,7 @@ pub extern "C" fn didkit_error_message() -> *const c_char {
     })
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 /// Retrieve a numeric code for the most recent error encountered by a DIDKit C function. If there
 /// has not been an error, 0 is returned.
 pub extern "C" fn didkit_error_code() -> c_int {
