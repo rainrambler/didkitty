@@ -1,6 +1,6 @@
 use clap::Args;
 
-use didkit::{HTTPDIDResolver, SeriesResolver, DID_METHODS};
+use didkitx::{HTTPDIDResolver, SeriesResolver, DID_METHODS};
 
 fn parse(s: &str) -> Result<HTTPDIDResolver, anyhow::Error> {
     Ok(HTTPDIDResolver::new(s))
@@ -17,7 +17,7 @@ pub struct ResolverOptions {
 }
 
 impl ResolverOptions {
-    pub fn to_resolver(&self) -> SeriesResolver {
+    pub fn to_resolver(&self) -> SeriesResolver<'_> {
         let mut resolvers = vec![DID_METHODS.to_resolver()];
         if let Some(http_did_resolver) = &self.did_resolver {
             resolvers.push(http_did_resolver);
