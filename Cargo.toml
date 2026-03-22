@@ -1,7 +1,7 @@
 [workspace]
 members = ["cli", "lib", "lib/cbindings", "lib/web"]
-
 default-members = ["cli", "lib", "lib/cbindings"]
+resolver = "3"
 
 # $ cargo release
 [workspace.metadata.release]
