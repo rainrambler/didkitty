@@ -19,7 +19,7 @@ use crate::{JWTOrLDPOptions, ProofFormat};
 /// The version of the DIDKit library, as a NULL-terminated string
 pub static VERSION_C: &str = concat!(env!("CARGO_PKG_VERSION"), "\0");
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 /// Get the version of the DIDKit library. Returns a static C string which should not be mutated or
 /// freed.
 pub extern "C" fn didkit_get_version() -> *const c_char {
@@ -46,10 +46,11 @@ fn generate_ed25519_key() -> Result<*const c_char, Error> {
     let jwk = JWK::generate_ed25519()?;
     Ok(CString::new(serde_json::to_string(&jwk)?)?.into_raw())
 }
+
 /// Generate a new Ed25519 keypair in JWK format. On success, returns a pointer to a
 /// newly-allocated string containing the JWK. The string must be freed with [`didkit_free_string`]. On
 /// failure, returns `NULL`; the error message can be retrieved with [`didkit_error_message`].
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn didkit_vc_generate_ed25519_key() -> *const c_char {
     ccchar_or_error(generate_ed25519_key())
 }
@@ -67,7 +68,8 @@ fn key_to_did(
         .ok_or(Error::UnableToGenerateDID)?;
     Ok(CString::new(did)?.into_raw())
 }
-#[no_mangle]
+
+#[unsafe(no_mangle)]
 /// Convert a key in JWK format to a did:key DID. Input should be a JWK containing public key
 /// parameters. Private key parameters in the JWK are ignored. On success, returns a
 /// newly-allocated C string containing a DID corresponding to the JWK. The returned string must be
@@ -102,11 +104,12 @@ fn key_to_verification_method(
         .ok_or(Error::UnableToGetVerificationMethod)?;
     Ok(CString::new(vm)?.into_raw())
 }
+
 /// Convert a key to a `did:key` DID URI for use in the `verificationMethod` property of a linked data
 /// proof. Input should be a C string containing the key as a JWK. The JWK should contain public
 /// key material; private key parameters are ignored. On success, this function returns a newly-allocated C string containing the `verificationMethod` URI. On failure, `NULL` is returned; the
 /// error message can be retrieved using [`didkit_error_message`].
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn didkit_key_to_verification_method(
     method_pattern: *const c_char,
     jwk: *const c_char,
@@ -147,7 +150,8 @@ fn issue_credential(
     };
     Ok(CString::new(out)?.into_raw())
 }
-#[no_mangle]
+
+#[unsafe(no_mangle)]
 /// Issue a Verifiable Credential. Input parameters are JSON C strings for the unsigned credential
 /// to be issued, the linked data proof options, and the JWK for signing.  On success, the
 /// newly-issued verifiable credential is returned as a newly-allocated C string.  The returned
@@ -191,7 +195,8 @@ fn verify_credential(
     };
     Ok(CString::new(serde_json::to_string(&result)?)?.into_raw())
 }
-#[no_mangle]
+
+#[unsafe(no_mangle)]
 /// Verify a Verifiable Credential. Arguments are a C string containing the Verifiable Credential
 /// to verify, and a C string containing a JSON object for the linked data proof options for
 /// verification. The return value is a newly-allocated C string containing a JSON object for the
@@ -241,7 +246,8 @@ fn issue_presentation(
     };
     Ok(CString::new(out)?.into_raw())
 }
-#[no_mangle]
+
+#[unsafe(no_mangle)]
 /// Issue a Verifiable Presentation. Input parameters are JSON C strings for the unsigned
 /// presentation to be issued, the linked data proof options, and the JWK for signing. On success,
 /// the newly-issued verifiable presentation is returned as a newly-allocated C string. The
@@ -293,7 +299,8 @@ fn did_auth(
     };
     Ok(CString::new(out)?.into_raw())
 }
-#[no_mangle]
+
+#[unsafe(no_mangle)]
 /// Issue a Verifiable Presentation for [DIDAuth](https://w3c-ccg.github.io/vp-request-spec/#did-authentication-request). Input parameters are the holder URI as a C string, and JSON C strings for the linked data proof options and the JWK for signing. On success,
 /// a newly-issued verifiable presentation is returned as a newly-allocated C string. The
 /// returned string should be freed using [`didkit_free_string`]. On failure, `NULL` is returned, and the
@@ -337,7 +344,8 @@ fn verify_presentation(
     };
     Ok(CString::new(serde_json::to_string(&result)?)?.into_raw())
 }
-#[no_mangle]
+
+#[unsafe(no_mangle)]
 /// Verify a Verifiable Presentation. Arguments are a C string containing the Verifiable
 /// Presentation to verify, and a C string containing a JSON object for the linked data proof
 /// options for verification. The return value is a newly-allocated C string containing a JSON
@@ -378,7 +386,7 @@ fn resolve_did(
     Ok(CString::new(serde_json::to_string(&result)?)?.into_raw())
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 /// Resolve a DID to a DID Document. Arguments are a C string containing the DID to resolve, and a
 /// C string containing a JSON object for resolution input metadata. The return value on success is
 /// a newly-allocated C string containing either the resolved DID document or a DID resolution
@@ -411,7 +419,7 @@ fn dereference_did_url(
     Ok(CString::new(serde_json::to_string(&result)?)?.into_raw())
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 /// Resolve a DID to a DID Document. Arguments are a C string containing the DID URL to dereference, and a
 /// C string containing a JSON object for dereferencing input metadata. The return value on success is
 /// a newly-allocated C string containing either a resolved resource or a DID resolution
@@ -424,7 +432,7 @@ pub extern "C" fn didkit_did_url_dereference(
     ccchar_or_error(dereference_did_url(did_url, input_metadata_json))
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 /// Free a C string that has been dynamically allocated by DIDKit. This should be used for strings
 /// returned from most DIDKit C functions, per their respective documentation.
 pub extern "C" fn didkit_free_string(string: *const c_char) {
