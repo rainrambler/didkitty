@@ -19,7 +19,7 @@ use crate::{JWTOrLDPOptions, ProofFormat};
 pub static VERSION: &str = env!("CARGO_PKG_VERSION");
 pub static DIDKIT_EXCEPTION_CLASS: &str = "com/spruceid/DIDKitException";
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "system" fn Java_com_spruceid_DIDKit_getVersion(env: JNIEnv, _class: JClass) -> jstring {
     env.new_string(VERSION)
         .expect("Unable to create Java string")
@@ -44,7 +44,7 @@ fn generate_ed25519_key(env: &JNIEnv) -> Result<jstring, Error> {
     Ok(env.new_string(jwk_json).unwrap().into_inner())
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "system" fn Java_com_spruceid_DIDKit_generateEd25519Key(
     env: JNIEnv,
     _class: JClass,
@@ -66,7 +66,7 @@ fn key_to_did(
     Ok(env.new_string(did).unwrap().into_inner())
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "system" fn Java_com_spruceid_DIDKit_keyToDID(
     env: JNIEnv,
     _class: JClass,
@@ -95,7 +95,7 @@ fn key_to_verification_method(
     Ok(env.new_string(verification_method).unwrap().into_inner())
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "system" fn Java_com_spruceid_DIDKit_keyToVerificationMethod(
     env: JNIEnv,
     _class: JClass,
@@ -139,7 +139,7 @@ fn issue_credential(
     Ok(env.new_string(vc_string).unwrap().into_inner())
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "system" fn Java_com_spruceid_DIDKit_issueCredential(
     env: JNIEnv,
     _class: JClass,
@@ -178,7 +178,7 @@ fn verify_credential(
     Ok(env.new_string(result_json).unwrap().into_inner())
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "system" fn Java_com_spruceid_DIDKit_verifyCredential(
     env: JNIEnv,
     _class: JClass,
@@ -222,7 +222,7 @@ fn issue_presentation(
     Ok(env.new_string(vp_string).unwrap().into_inner())
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "system" fn Java_com_spruceid_DIDKit_issuePresentation(
     env: JNIEnv,
     _class: JClass,
@@ -268,7 +268,7 @@ fn did_auth(
     Ok(env.new_string(vp_string).unwrap().into_inner())
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "system" fn Java_com_spruceid_DIDKit_DIDAuth(
     env: JNIEnv,
     _class: JClass,
@@ -307,7 +307,7 @@ fn verify_presentation(
     Ok(env.new_string(result_json).unwrap().into_inner())
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "system" fn Java_com_spruceid_DIDKit_verifyPresentation(
     env: JNIEnv,
     _class: JClass,
@@ -342,7 +342,7 @@ fn resolve_did(
     Ok(env.new_string(result_json).unwrap().into_inner())
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "system" fn Java_com_spruceid_DIDKit_resolveDID(
     env: JNIEnv,
     _class: JClass,
@@ -371,7 +371,7 @@ fn dereference_did_url(
     Ok(env.new_string(result_json).unwrap().into_inner())
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "system" fn Java_com_spruceid_DIDKit_dereferenceDIDURL(
     env: JNIEnv,
     _class: JClass,
