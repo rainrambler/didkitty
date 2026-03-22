@@ -2,7 +2,7 @@ use std::io::{stdout, BufWriter};
 
 use anyhow::Result;
 use clap::{Args, Subcommand};
-use didkit::{get_verification_method, ssi::ssh, Error, Source, DID_METHODS, JWK};
+use didkitx::{get_verification_method, ssi::ssh, Error, Source, DID_METHODS, JWK};
 use sshkeys::PublicKey;
 
 #[derive(Subcommand)]
