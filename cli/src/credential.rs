@@ -2,7 +2,7 @@ use std::io::{stdin, stdout, BufReader, BufWriter, Read};
 
 use anyhow::Result;
 use clap::{Args, Subcommand};
-use didkit::{
+use didkitx::{
     generate_proof, ContextLoader, LinkedDataProofOptions, ProofFormat, VerifiableCredential, JWK,
 };
 use tracing::warn;
