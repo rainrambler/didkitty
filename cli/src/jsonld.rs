@@ -2,7 +2,7 @@ use std::io::{stdin, stdout, BufReader, Read, Write};
 
 use anyhow::Result;
 use clap::{Args, Subcommand};
-use didkit::ssi::{
+use didkitx::ssi::{
     self,
     jsonld::{parse_ld_context, StaticLoader},
     rdf,
