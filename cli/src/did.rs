@@ -6,7 +6,7 @@ use std::{
 
 use anyhow::{anyhow, Context, Result};
 use clap::{Args, Subcommand};
-use didkit::{
+use didkitx::{
     generate_proof,
     ssi::{
         did::{DIDMethodTransaction, Service, ServiceEndpoint, VerificationMethodMap},
@@ -500,7 +500,7 @@ pub async fn dereference(args: DidDereferenceArgs) -> Result<()> {
         serde_json::from_value(deref_input_meta_value).unwrap();
     let stdout_writer = BufWriter::new(stdout());
     let (deref_meta, content, content_meta) =
-        didkit::dereference(&resolver, &args.did_url, &deref_input_meta).await;
+        didkitx::dereference(&resolver, &args.did_url, &deref_input_meta).await;
     if args.with_metadata {
         let result = json!([deref_meta, content, content_meta]);
         serde_json::to_writer_pretty(stdout_writer, &result).unwrap();
